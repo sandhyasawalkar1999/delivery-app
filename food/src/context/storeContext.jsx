@@ -11,15 +11,15 @@ const StoreContextProvider = ({ children }) => {
 
   // Function to add item to cart & update in backend
   const addToCart = async (itemId) => {
-    setCartItems((prev) => ({
-      ...prev,
-      [itemId]: prev[itemId] ? prev[itemId] + 1 : 1,
-    }));
+    setCartItems((prev) => {
+      const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + 1 };
+      localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+      return updatedCart;
+    });
 
     if (token) {
       try {
-        await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } }
-        );
+        await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
@@ -35,32 +35,35 @@ const StoreContextProvider = ({ children }) => {
       } else {
         delete updatedCart[itemId]; // Remove when count reaches 0
       }
+      localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
       return updatedCart;
     });
 
     if (token) {
       try {
-        const response = await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
-        console.log("Remove API Response:", response.data);
+        await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
       } catch (error) {
         console.error("Error removing from cart:", error.response?.data || error.message);
       }
     }
   };
 
-  const loadCardData = async (token) => {
+  // Load cart data from backend
+  const loadCartData = async (userToken) => {
     try {
+      const response = await axios.get(url + "/api/cart/get", { headers: { token: userToken } });
+      const backendCart = response.data.cartData || {};
 
-      const response = await axios.get(url + "/api/cart/get", {}, { headers: { token } });
-      setCartItems(response.data.cartData || {});
-      console.log("response", response.data);
+      // Merge localStorage cart with backend cart
+      const storedCart = JSON.parse(localStorage.getItem("cartItems")) || {};
+      const mergedCart = { ...storedCart, ...backendCart };
 
+      setCartItems(mergedCart);
+      localStorage.setItem("cartItems", JSON.stringify(mergedCart)); // Ensure storage is up-to-date
     } catch (error) {
       console.error("Error loading cart data:", error);
     }
-  }
-
-
+  };
 
   // Function to calculate total cart amount
   const getTotalCartAmount = () => {
@@ -76,26 +79,30 @@ const StoreContextProvider = ({ children }) => {
   const fetchFoodList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
-      // console.log(response);
       setFoodList(response.data.data);
     } catch (error) {
       console.error("Error fetching food list:", error);
     }
   };
 
-  //loadcartdata
-
-
   // Load initial data when component mounts
   useEffect(() => {
     const loadData = async () => {
       await fetchFoodList();
-      if (localStorage.getItem("token")) {
-        setToken(localStorage.getItem("token"));
-        await loadCardData(localStorage.getItem("token"));
-      }
 
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        setToken(storedToken);
+        await loadCartData(storedToken);
+      } else {
+        // Load cartItems only from localStorage if no token is present
+        const storedCart = localStorage.getItem("cartItems");
+        if (storedCart) {
+          setCartItems(JSON.parse(storedCart));
+        }
+      }
     };
+
     loadData();
   }, []);
 
