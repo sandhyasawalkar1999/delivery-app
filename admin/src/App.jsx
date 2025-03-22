@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 
 const App = () => {
+  const url = "https://delivery-app-wxc1.onrender.com"
   return (
     <div>
       <ToastContainer position="top-right" autoClose={3000} />
