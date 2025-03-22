@@ -15,13 +15,13 @@ const port = 4000
 
 //middlewares
 app.use(express.json())
-app.use(cors()); //allow all origins(for development)
-// app.use(cors({
-//   origin: "http://localhost:5173",
-//   credentials: true,
-//   allowedHeaders: ["Content-Type", "Authorization", "token"],
-//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
-// }));
+// app.use(cors()); //allow all origins(for development)
+app.use(cors({
+  origin: "*",
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+}));
 
 //db connection
 connectDB();

@@ -7,7 +7,7 @@ const StoreContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-  const url = "http://localhost:4000";
+  const url = "https://delivery-app-wxc1.onrender.com";
 
   // Function to add item to cart & update in backend
   const addToCart = async (itemId) => {
@@ -50,7 +50,7 @@ const StoreContextProvider = ({ children }) => {
 
   const loadCardData = async (token) => {
     try {
-    
+
       const response = await axios.get(url + "/api/cart/get", {}, { headers: { token } });
       setCartItems(response.data.cartData || {});
       console.log("response", response.data);
