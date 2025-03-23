@@ -14,6 +14,7 @@ const StoreContextProvider = ({ children }) => {
     setCartItems((prev) => {
       const updatedCart = { ...prev, [itemId]: (prev[itemId] || 0) + 1 };
       localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+      console.log("Cart after add:", updatedCart);
       return updatedCart;
     });
 
@@ -36,6 +37,7 @@ const StoreContextProvider = ({ children }) => {
         delete updatedCart[itemId]; // Remove when count reaches 0
       }
       localStorage.setItem("cartItems", JSON.stringify(updatedCart)); // Save to localStorage
+      console.log("Cart after remove:", updatedCart);
       return updatedCart;
     });
 
@@ -60,6 +62,7 @@ const StoreContextProvider = ({ children }) => {
 
       setCartItems(mergedCart);
       localStorage.setItem("cartItems", JSON.stringify(mergedCart)); // Ensure storage is up-to-date
+      console.log("Cart after backend merge:", mergedCart);
     } catch (error) {
       console.error("Error loading cart data:", error);
     }
@@ -88,6 +91,7 @@ const StoreContextProvider = ({ children }) => {
   // Load initial data when component mounts
   useEffect(() => {
     const loadData = async () => {
+      console.log("Loading data on mount...");
       await fetchFoodList();
 
       const storedToken = localStorage.getItem("token");
@@ -98,6 +102,7 @@ const StoreContextProvider = ({ children }) => {
         // Load cartItems only from localStorage if no token is present
         const storedCart = localStorage.getItem("cartItems");
         if (storedCart) {
+          console.log("Loaded from localStorage:", JSON.parse(storedCart));
           setCartItems(JSON.parse(storedCart));
         }
       }
@@ -105,6 +110,11 @@ const StoreContextProvider = ({ children }) => {
 
     loadData();
   }, []);
+
+  // Debugging: Log cart state changes
+  useEffect(() => {
+    console.log("Cart Updated:", cartItems);
+  }, [cartItems]);
 
   // Context value
   const contextValue = {

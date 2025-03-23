@@ -4,6 +4,7 @@ import '../Cart/Cart.css'
 import './PlaceOrder.css'
 
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const PlaceOrder = () => {
   const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
@@ -25,30 +26,81 @@ const PlaceOrder = () => {
     const value = e.target.value;
     setData((prev) => ({ ...prev, [name]: value }));
   }
+  // const placeOrder = async (e) => {
+  //   e.preventDefault();
+  //   let orderItems = [];
+  //   food_list.map((item) => {
+  //     if (cartItems[item._id] > 0) {
+  //       let itemInfo = item;
+  //       itemInfo["quantity"] = cartItems[item._id];
+  //       orderItems.push(itemInfo);
+  //     }
+  //   })
+  //   let orderData = {
+  //     address: data,
+  //     items: orderItems,
+  //     amount: getTotalCartAmount() + 2,
+  //   }
+  //   let response = await axios.post(url + "/api/orders/place", orderData, { headers: token });
+  //   if (response.data.success) {
+  //     const { session_url } = response.data;
+  //     window.location.replace(session_url);
+  //   }
+  //   else {
+  //     alert("Error");
+  //   }
+  // }
   const placeOrder = async (e) => {
     e.preventDefault();
-    let orderItems = [];
-    food_list.map((item) => {
-      if (cartItems[item._id] > 0) {
-        let itemInfo = item;
-        itemInfo["quantity"] = cartItems[item._id];
-        orderItems.push(itemInfo);
-      }
-    })
+
+    if (!token) {
+      alert("You must be logged in to place an order.");
+      return;
+    }
+
+    let orderItems = food_list
+      .filter(item => cartItems[item._id] > 0)
+      .map(item => ({
+        ...item,
+        quantity: cartItems[item._id],
+      }));
+
     let orderData = {
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + 2,
+      amount: getTotalCartAmount() + 20, // Ensure correct total
+    };
+
+    console.log("Placing order with:", orderData);
+
+    try {
+      let response = await axios.post(url + "/api/order/place", orderData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log("Order Response:", response.data);
+
+      if (response.data.success) {
+        window.location.replace(response.data.session_url);
+      } else {
+        alert("Error placing order.");
+      }
+    } catch (error) {
+      console.error("Error placing order:", error.response?.data || error.message);
     }
-    let response = await axios.post(url + "/api/order/place", orderData, { headers: token });
-    if (response.data.success) {
-      const { session_url } = response.data;
-      window.location.replace(session_url);
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/')
+    } else if (getTotalCartAmount() === 0) {
+      navigate('/cart');
     }
-    else {
-      alert("Error");
-    }
-  }
+
+  }, [token])
+
+
 
   return (
     <form onSubmit={placeOrder} className='place-order'>
