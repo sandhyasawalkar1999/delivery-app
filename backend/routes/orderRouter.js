@@ -4,9 +4,9 @@ import { placeOrder, verifyOrder, userOrders, listOrder, updateOrderStatus } fro
 
 const router = express.Router();
 
-router.post('/place', authMiddleware, placeOrder);
+router.post('/place', placeOrder);
 router.post('/verify', verifyOrder);
-router.post('/userorders', authMiddleware, userOrders);
+router.post('/userorders', userOrders);
 router.get('/list', listOrder);
 router.post('/status', updateOrderStatus)
 
