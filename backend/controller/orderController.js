@@ -3,24 +3,26 @@ dotenv.config();
 
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import authMiddleware from "../middleware/auth.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-//place order
+
+// Place Order (Updated to use req.userId)
 const placeOrder = async (req, res) => {
   const frontend_url = "http://localhost:5173/";
 
   try {
     const newOrder = new orderModel({
-      userId: req.body.userId,
+      userId: req.userId,  // ✅ Extracted from token
       items: req.body.items,
       amount: req.body.amount,
       address: req.body.address
     });
 
     await newOrder.save();
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+    await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
 
     const line_items = req.body.items.map((item) => ({
       price_data: {
@@ -28,7 +30,7 @@ const placeOrder = async (req, res) => {
         product_data: {
           name: item.name
         },
-        unit_amount: item.price * 100  // ✅ Fix unit_amount calculation
+        unit_amount: item.price * 100  // Ensure correct price format
       },
       quantity: item.quantity
     }));
@@ -39,7 +41,7 @@ const placeOrder = async (req, res) => {
         product_data: {
           name: "Delivery Charge"
         },
-        unit_amount: 200 // ✅ Fix hardcoded charge (₹2.00)
+        unit_amount: 200  // Fixed delivery charge
       },
       quantity: 1
     });
@@ -68,6 +70,7 @@ const placeOrder = async (req, res) => {
     });
   }
 };
+
 
 //verify order
 

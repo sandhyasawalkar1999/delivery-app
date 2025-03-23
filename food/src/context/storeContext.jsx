@@ -7,7 +7,7 @@ const StoreContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-  const url = "https://delivery-app-2-fwso.onrender.com";
+  const url = "https://delivery-app-2-fwso.onrender.com"
 
   // Function to add item to cart & update in backend
   const addToCart = async (itemId) => {
@@ -70,7 +70,7 @@ const StoreContextProvider = ({ children }) => {
 
   // Function to calculate total cart amount
   const getTotalCartAmount = () => {
-    if (!cartItems || typeof cartItems !== "object") return 0; // Prevent error
+    if (!cartItems || typeof cartItems !== "object") return 0;
 
     return Object.keys(cartItems).reduce((total, itemId) => {
       const itemInfo = food_list.find((product) => product._id === itemId);

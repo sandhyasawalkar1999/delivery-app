@@ -26,30 +26,7 @@ const PlaceOrder = () => {
     const value = e.target.value;
     setData((prev) => ({ ...prev, [name]: value }));
   }
-  // const placeOrder = async (e) => {
-  //   e.preventDefault();
-  //   let orderItems = [];
-  //   food_list.map((item) => {
-  //     if (cartItems[item._id] > 0) {
-  //       let itemInfo = item;
-  //       itemInfo["quantity"] = cartItems[item._id];
-  //       orderItems.push(itemInfo);
-  //     }
-  //   })
-  //   let orderData = {
-  //     address: data,
-  //     items: orderItems,
-  //     amount: getTotalCartAmount() + 2,
-  //   }
-  //   let response = await axios.post(url + "/api/orders/place", orderData, { headers: token });
-  //   if (response.data.success) {
-  //     const { session_url } = response.data;
-  //     window.location.replace(session_url);
-  //   }
-  //   else {
-  //     alert("Error");
-  //   }
-  // }
+
   const placeOrder = async (e) => {
     e.preventDefault();
 
@@ -65,16 +42,29 @@ const PlaceOrder = () => {
         quantity: cartItems[item._id],
       }));
 
+    // 🔹 Extract user ID from the token
+    let userId;
+    try {
+      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT token
+      userId = decodedToken?.id || decodedToken?.userId; // Ensure this is correct based on your backend token structure
+    } catch (err) {
+      console.error("Invalid token:", err);
+      alert("Session expired. Please log in again.");
+      return;
+    }
+
+    // ✅ Ensure userId is included in the request
     let orderData = {
+      userId, // 🔹 Add userId to the order request
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + 20, // Ensure correct total
+      amount: getTotalCartAmount() + 20,
     };
 
     console.log("Placing order with:", orderData);
 
     try {
-      let response = await axios.post(url + "/api/order/place", orderData, {
+      let response = await axios.post(url + "/api/orders/place", orderData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log("Order Response:", response.data);
@@ -88,6 +78,7 @@ const PlaceOrder = () => {
       console.error("Error placing order:", error.response?.data || error.message);
     }
   };
+
 
   const navigate = useNavigate();
 
