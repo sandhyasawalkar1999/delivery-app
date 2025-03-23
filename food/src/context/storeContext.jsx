@@ -7,7 +7,7 @@ const StoreContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
-  const url = "https://delivery-app-wxc1.onrender.com";
+  const url = "https://delivery-app-2-fwso.onrender.com";
 
   // Function to add item to cart & update in backend
   const addToCart = async (itemId) => {
