@@ -51,9 +51,10 @@ const List = ({ url }) => {
           <b>Action</b>
         </div>
         {list.map((item, index) => {
+          console.log(item);
           return (
             <div key={index} className='list-table-format'>
-              <img src={`${url}/images/${item.image}`} alt="item image" />
+              <img loading="lazy" src={`${url}/images/${item.image}`} alt="item image" />
               <p>{item.name}</p>
               <p>{item.category}</p>
               <p>{item.price}</p>

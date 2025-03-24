@@ -23,13 +23,46 @@ const Order = ({ url }) => {
     }
   };
 
+  //   try {
+  //     console.log("Changing status for order:", orderId, "to", event.target.value);
+  //     const response = await axios.post(url + "/api/orders/update-status", {
+  //       orderId,
+  //       status: event.target.value,
+  //     });
+
+  //     if (response.data.success) {
+  //       toast.success("Status updated successfully");
+  //       fetchAllOrders(); // Re-fetch orders to reflect changes
+  //     } else {
+  //       toast.error("Failed to update status");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating status:", error);
+  //     toast.error("Error updating status");
+  //   }
+  // };
   const statusHandler = async (event, orderId) => {
     try {
       console.log("Changing status for order:", orderId, "to", event.target.value);
-      const response = await axios.post(url + "/api/orders/update-status", {
-        orderId,
-        status: event.target.value,
-      });
+
+      const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+      if (!token) {
+        toast.error("User not authenticated");
+        return;
+      }
+
+      const response = await axios.post(
+        url + "/api/orders/update-status",
+        {
+          orderId,
+          status: event.target.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Status updated successfully");

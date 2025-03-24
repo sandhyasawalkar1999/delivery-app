@@ -10,10 +10,10 @@ const FoodItem = ({ id, name, price, description, image }) => {
   return (
     <div className='food-item'>
       <div className='food-item-img-container'>
-        <img className="food-item-image" src={url + "/images/" + image} alt={name} />
+        <img loading='lazy' className="food-item-image" src={url + "/images/" + image} alt={name} />
         {
           !cartItems[id]
-            ? <img className='add' onClick={() => addToCart(id)} src={assets.add_icon_white} alt="add item buttom" />
+            ? <img className='add' loading='lazy' onClick={() => addToCart(id)} src={assets.add_icon_white} alt="add item buttom" />
             : <div className='food-item-counter'>
               <img onClick={() => removeFromCart(id)} src={assets.remove_icon_red} alt="remove item" />
               <p>{cartItems[id]}</p>

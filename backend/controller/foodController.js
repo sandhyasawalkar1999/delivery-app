@@ -52,9 +52,11 @@ const listFood = async (req, res) => {
 //delete food item
 const deleteFood = async (req, res) => {
   try {
-    const food = await foodModel.findById(req.body._id);
+    const foodId = req.params._id; // Extracting from params
+    console.log("Food ID received:", foodId); // Debugging log
 
-    // Check if food exists
+    const food = await foodModel.findById(foodId);
+
     if (!food) {
       return res.status(404).json({
         success: false,
@@ -70,7 +72,7 @@ const deleteFood = async (req, res) => {
     }
 
     // Delete the food item from the database
-    await foodModel.findByIdAndDelete(req.body._id);
+    await foodModel.findByIdAndDelete(foodId);
 
     res.json({
       success: true,
@@ -86,6 +88,7 @@ const deleteFood = async (req, res) => {
     });
   }
 };
+
 
 
 export { addFood, listFood, deleteFood }

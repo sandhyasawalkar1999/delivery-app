@@ -10,8 +10,8 @@ import 'react-toastify/dist/ReactToastify.css'
 
 
 const App = () => {
-  // const url = "https://delivery-app-2-fwso.onrender.com"
-  const url = "http://localhost:4000"
+  const url = "https://delivery-app-2-fwso.onrender.com"
+  // const url = "http://localhost:4000"
   return (
     <div>
       <ToastContainer position="top-right" autoClose={3000} />
